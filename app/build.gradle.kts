@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,7 +11,11 @@ plugins {
 android {
     namespace = "com.example.githubsearch"
     compileSdk = 36
-
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
     defaultConfig {
         applicationId = "com.example.githubsearch"
         minSdk = 26
@@ -48,14 +55,14 @@ android {
     productFlavors {
         create("dev") {
             dimension = "environment"
-            buildConfigField("String", "BASE_URL", "\"https://api.github.com/\"")
-            buildConfigField("String", "GITHUB_TOKEN", "\"\"")
+            buildConfigField("String", "BASE_URL", "\"${localProperties.getProperty("BASE_URL", "https://api.github.com/")}\"")
+            buildConfigField("String", "GITHUB_TOKEN", "\"${localProperties.getProperty("GITHUB_TOKEN", "")}\"")
             resValue("string", "app_name", "GitHub Search (DEV)")
         }
         create("prod") {
             dimension = "environment"
-            buildConfigField("String", "BASE_URL", "\"https://api.github.com/\"")
-            buildConfigField("String", "GITHUB_TOKEN", "\"\"")
+            buildConfigField("String", "BASE_URL", "\"${localProperties.getProperty("BASE_URL", "https://api.github.com/")}\"")
+            buildConfigField("String", "GITHUB_TOKEN", "\"${localProperties.getProperty("GITHUB_TOKEN", "")}\"")
             resValue("string", "app_name", "GitHub Search")
         }
     }
@@ -81,6 +88,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.text.google.fonts)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.com.squareup.retrofit2.retrofit)
-    implementation(libs.com.squareup.retrofit2.converter.json)
+    implementation(libs.com.squareup.retrofit2.converter.gson)
     implementation(libs.io.coil.kt.coil.compose)
 }

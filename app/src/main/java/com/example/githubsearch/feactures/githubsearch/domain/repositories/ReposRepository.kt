@@ -1,5 +1,7 @@
 package com.example.githubsearch.feactures.githubsearch.domain.repositories
 
-interface ReposRepository {
+import com.example.githubsearch.feactures.githubsearch.domain.entities.Repos
 
+interface ReposRepository {
+    suspend fun searchRepositories(query: String): List<Repos>
 }

@@ -1,21 +1,18 @@
 package com.example.githubsearch.feactures.githubsearch.domain.entities
 
-
-
 data class Repos(
-    val id: Long,
+    val id: Int,
     val name: String,
     val fullName: String,
-    val owner: Owners,
+    val description: String?,
     val htmlUrl: String,
-    val description: String,
     val stargazersCount: Int,
-    val language: String,
     val forksCount: Int,
-    val updatedAt: String
+    val language: String?,
+    val owner: Owner
 )
 
-data class Owners(
+data class Owner(
     val login: String,
     val avatarUrl: String
 )

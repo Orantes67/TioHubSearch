@@ -1,28 +1,26 @@
 package com.example.githubsearch.feactures.githubsearch.data.datasources.remote.mapper
 
+import com.example.githubsearch.feactures.githubsearch.data.datasources.remote.model.RepoItem
 import com.example.githubsearch.feactures.githubsearch.domain.entities.Repos
-import com.example.githubsearch.feactures.githubsearch.domain.entities.Owners
-import com.example.githubsearch.feactures.githubsearch.data.datasources.remote.model.Owner as OwnerDto
-import com.example.githubsearch.feactures.githubsearch.data.datasources.remote.model.RepositoryItem as RepositoryItemDto
+import com.example.githubsearch.feactures.githubsearch.domain.entities.Owner
 
-fun RepositoryItemDto.toDomain(): Repos {
-    return Repos(
-        id = this.id,
-        name = this.name,
-        fullName = this.fullName,
-        owner = this.owner.toDomain(),
-        htmlUrl = this.htmlUrl,
-        description = this.description ?: "Sin descripción",
-        stargazersCount = this.stargazersCount,
-        language = this.language ?: "N/A",
-        forksCount = this.forksCount,
-        updatedAt = this.updatedAt
-    )
-}
-
-fun OwnerDto.toDomain(): Owners {
-    return Owners(
-        login = this.login,
-        avatarUrl = this.avatarUrl
-    )
+class ReposMapper {
+    fun mapToDomain(repoItem: RepoItem): Repos {
+        return Repos(
+            id = repoItem.id,
+            name = repoItem.name,
+            fullName = repoItem.fullName,
+            description = repoItem.description ?: "",
+            url = repoItem.htmlUrl,
+            htmlUrl = repoItem.htmlUrl,
+            stars = repoItem.stargazersCount,
+            stargazersCount = repoItem.stargazersCount,
+            forksCount = repoItem.forksCount,
+            language = repoItem.language ?: "N/A",
+            owner = Owner(
+                login = repoItem.owner.login,
+                avatarUrl = repoItem.owner.avatarUrl
+            )
+        )
+    }
 }

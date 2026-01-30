@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.githubsearch.feactures.githubsearch.domain.entities.Repos
+import com.example.githubsearch.feactures.githubsearch.domain.usecases.GetReposUseCase
 import com.example.githubsearch.feactures.githubsearch.presentation.viewmodels.Category
 import com.example.githubsearch.feactures.githubsearch.presentation.viewmodels.ReposUiState
 import com.example.githubsearch.feactures.githubsearch.presentation.viewmodels.TioHubViewModel
@@ -381,5 +382,10 @@ fun getLanguageColor(language: String): Color {
 @Preview(showBackground = true)
 @Composable
 fun TioHubScreenPreview() {
-    TioHubScreen()
+    val fakeViewModel = TioHubViewModel(
+        getReposUseCase = GetReposUseCase(object : ReposRepository {
+            override suspend fun searchRepositories(query: String) = emptyList<Repos>()
+        })
+    )
+    TioHubScreen(viewModel = fakeViewModel)
 }
