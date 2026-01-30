@@ -1,5 +1,7 @@
 package com.example.githubsearch.feactures.githubsearch.data.datasources.remote.mapper
+
 import com.example.githubsearch.feactures.githubsearch.domain.entities.Repos
+import com.example.githubsearch.feactures.githubsearch.domain.entities.Owners
 import com.example.githubsearch.feactures.githubsearch.data.datasources.remote.model.Owner as OwnerDto
 import com.example.githubsearch.feactures.githubsearch.data.datasources.remote.model.RepositoryItem as RepositoryItemDto
 

@@ -2,9 +2,8 @@ package com.example.githubsearch.feactures.githubsearch.domain.usecases
 
 import com.example.githubsearch.feactures.githubsearch.data.repositories.ReposRepository
 import com.example.githubsearch.feactures.githubsearch.domain.entities.Repos
-import javax.inject.Inject
 
-class GetReposUseCase @Inject constructor(
+class GetReposUseCase(
     private val repository: ReposRepository
 ) {
     suspend operator fun invoke(searchQuery: String, category: String): Result<List<Repos>> {
