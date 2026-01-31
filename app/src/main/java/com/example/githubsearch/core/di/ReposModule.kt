@@ -9,32 +9,28 @@ import com.example.githubsearch.feactures.githubsearch.domain.usecases.GetReposU
 import com.example.githubsearch.feactures.githubsearch.presentation.viewmodels.TioHubViewModelFactory
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.Properties
-import java.io.FileInputStream
-import java.io.File
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import java.util.concurrent.TimeUnit
 
 object DependencyContainer {
 
-    private fun getLocalProperty(key: String, context: Context): String {
-        return try {
-            val properties = Properties()
-            val localPropertiesFile = File(context.filesDir.parentFile?.parentFile?.parentFile, "local.properties")
-            if (localPropertiesFile.exists()) {
-                properties.load(FileInputStream(localPropertiesFile))
-                properties.getProperty(key, "https://api.github.com/")
-            } else {
-                "https://api.github.com/"
-            }
-        } catch (e: Exception) {
-            "https://api.github.com/"
-        }
-    }
+    private const val GITHUB_API_BASE_URL = "https://api.github.com/"
 
     // Network
     fun createRetrofit(context: Context): Retrofit {
-        val baseUrl = getLocalProperty("BASE_URL", context)
+        val httpClient = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
+            .build()
+
         return Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(GITHUB_API_BASE_URL)
+            .client(httpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

@@ -24,91 +24,72 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.githubsearch.feactures.githubsearch.domain.entities.Repos
-import com.example.githubsearch.feactures.githubsearch.domain.usecases.GetReposUseCase
 import com.example.githubsearch.feactures.githubsearch.presentation.viewmodels.Category
 import com.example.githubsearch.feactures.githubsearch.presentation.viewmodels.ReposUiState
 import com.example.githubsearch.feactures.githubsearch.presentation.viewmodels.TioHubViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TioHubScreen(
-    viewModel: TioHubViewModel
+    viewModel: TioHubViewModel,
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "TioHub",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        // Barra de búsqueda
+        SearchBar(
+            searchQuery = searchQuery,
+            onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
+            onSearch = { viewModel.searchRepositories() },
+            onClear = { viewModel.clearSearch() },
+            modifier = Modifier.padding(16.dp)
+        )
+
+        // Filtros de categorías
+        CategoryFilters(
+            categories = viewModel.categories,
+            selectedCategory = selectedCategory,
+            onCategorySelected = { viewModel.onCategorySelected(it) },
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+
+        // Contenido principal
+        when (uiState) {
+            is ReposUiState.Initial -> {
+                EmptyState(
+                    message = "Busca repositorios o selecciona una categoría",
+                    modifier = Modifier.fillMaxSize()
                 )
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Barra de búsqueda
-            SearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
-                onSearch = { viewModel.searchRepositories() },
-                onClear = { viewModel.clearSearch() },
-                modifier = Modifier.padding(16.dp)
-            )
-
-            // Filtros de categorías
-            CategoryFilters(
-                categories = viewModel.categories,
-                selectedCategory = selectedCategory,
-                onCategorySelected = { viewModel.onCategorySelected(it) },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-
-            // Contenido principal
-            when (uiState) {
-                is ReposUiState.Initial -> {
-                    EmptyState(
-                        message = "Busca repositorios o selecciona una categoría",
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-                is ReposUiState.Loading -> {
-                    LoadingState(modifier = Modifier.fillMaxSize())
-                }
-                is ReposUiState.Success -> {
-                    RepositoryList(
-                        repositories = (uiState as ReposUiState.Success).repos,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-                is ReposUiState.Empty -> {
-                    EmptyState(
-                        message = "No se encontraron repositorios",
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-                is ReposUiState.Error -> {
-                    ErrorState(
-                        message = (uiState as ReposUiState.Error).message,
-                        onRetry = { viewModel.searchRepositories() },
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+            }
+            is ReposUiState.Loading -> {
+                LoadingState(modifier = Modifier.fillMaxSize())
+            }
+            is ReposUiState.Success -> {
+                RepositoryList(
+                    repositories = (uiState as ReposUiState.Success).repos,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            is ReposUiState.Empty -> {
+                EmptyState(
+                    message = "No se encontraron repositorios",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            is ReposUiState.Error -> {
+                ErrorState(
+                    message = (uiState as ReposUiState.Error).message,
+                    onRetry = { viewModel.searchRepositories() },
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }
@@ -122,28 +103,47 @@ fun SearchBar(
     onClear: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    OutlinedTextField(
-        value = searchQuery,
-        onValueChange = onSearchQueryChange,
+    Row(
         modifier = modifier.fillMaxWidth(),
-        placeholder = { Text("Buscar repositorios...") },
-        leadingIcon = {
-            Icon(Icons.Default.Search, contentDescription = "Buscar")
-        },
-        trailingIcon = {
-            if (searchQuery.isNotEmpty()) {
-                IconButton(onClick = onClear) {
-                    Icon(Icons.Default.Clear, contentDescription = "Limpiar")
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = onSearchQueryChange,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            placeholder = { Text("Buscar repositorios...") },
+            leadingIcon = {
+                Icon(Icons.Default.Search, contentDescription = "Buscar")
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = onClear) {
+                        Icon(Icons.Default.Clear, contentDescription = "Limpiar")
+                    }
                 }
-            }
-        },
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+            )
         )
-    )
+        Button(
+            onClick = onSearch,
+            modifier = Modifier.height(56.dp),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Icon(
+                Icons.Default.Search,
+                contentDescription = "Buscar",
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
 }
 
 @Composable
@@ -237,10 +237,10 @@ fun RepositoryCard(
             }
 
             // Descripción
-            if (repository.description.isNotEmpty()) {
+            if (!repository.description.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = repository.description,
+                    text = repository.description ?: "",
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
@@ -256,17 +256,17 @@ fun RepositoryCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Lenguaje
-                if (repository.language != "N/A") {
+                if (!repository.language.isNullOrEmpty() && repository.language != "N/A") {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
                                 .size(12.dp)
                                 .clip(CircleShape)
-                                .background(getLanguageColor(repository.language))
+                                .background(getLanguageColor(repository.language ?: ""))
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = repository.language,
+                            text = repository.language ?: "",
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -382,10 +382,14 @@ fun getLanguageColor(language: String): Color {
 @Preview(showBackground = true)
 @Composable
 fun TioHubScreenPreview() {
-    val fakeViewModel = TioHubViewModel(
-        getReposUseCase = GetReposUseCase(object : ReposRepository {
-            override suspend fun searchRepositories(query: String) = emptyList<Repos>()
-        })
-    )
-    TioHubScreen(viewModel = fakeViewModel)
+    // Preview simple sin ViewModel
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = "TioHub Preview",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
 }

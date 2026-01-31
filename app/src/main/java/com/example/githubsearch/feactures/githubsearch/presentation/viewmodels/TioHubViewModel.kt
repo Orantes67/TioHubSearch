@@ -43,6 +43,11 @@ class TioHubViewModel(
         searchRepositories()
     }
 
+    init {
+        // Cargar repositorios iniciales cuando se carga la categoría "Todos"
+        searchRepositories()
+    }
+
     fun searchRepositories() {
         viewModelScope.launch {
             _uiState.value = ReposUiState.Loading
@@ -61,6 +66,7 @@ class TioHubViewModel(
                     }
                 },
                 onFailure = { error ->
+                    android.util.Log.e("TioHubViewModel", "Error en búsqueda: ${error.message}", error)
                     ReposUiState.Error(error.message ?: "Error desconocido")
                 }
             )
