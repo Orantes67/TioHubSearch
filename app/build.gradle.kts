@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.secrets.gradle)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.devtools.ksp)
 }
 
 android {
@@ -91,4 +93,7 @@ dependencies {
     implementation(libs.com.squareup.retrofit2.converter.gson)
     implementation(libs.com.squareup.okhttp3.logging.interceptor)
     implementation(libs.io.coil.kt.coil.compose)
+    implementation(libs.hilt.android)                               // Implementación de Hilt
+    implementation(libs.hilt.navigation.compose)                    // Integración con Jetpack Compose
+    ksp(libs.hilt.compiler)
 }

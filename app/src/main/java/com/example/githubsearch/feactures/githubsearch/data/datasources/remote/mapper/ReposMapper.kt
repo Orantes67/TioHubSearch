@@ -3,8 +3,9 @@ package com.example.githubsearch.feactures.githubsearch.data.datasources.remote.
 import com.example.githubsearch.feactures.githubsearch.data.datasources.remote.model.RepositoryDto
 import com.example.githubsearch.feactures.githubsearch.domain.entities.Repos
 import com.example.githubsearch.feactures.githubsearch.domain.entities.Owner
+import javax.inject.Inject
 
-class ReposMapper {
+class ReposMapper @Inject constructor() {
     fun mapToDomain(repositoryDto: RepositoryDto): Repos {
         return Repos(
             id = repositoryDto.id,

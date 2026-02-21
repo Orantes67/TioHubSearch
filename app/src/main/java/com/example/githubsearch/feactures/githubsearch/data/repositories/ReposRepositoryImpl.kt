@@ -4,8 +4,9 @@ import com.example.githubsearch.core.network.GithubApi
 import com.example.githubsearch.feactures.githubsearch.data.datasources.remote.mapper.ReposMapper
 import com.example.githubsearch.feactures.githubsearch.domain.entities.Repos
 import com.example.githubsearch.feactures.githubsearch.domain.repositories.ReposRepository
+import javax.inject.Inject
 
-class ReposRepositoryImpl(
+class ReposRepositoryImpl @Inject constructor(
     private val githubApi: GithubApi,
     private val mapper: ReposMapper
 ) : ReposRepository {

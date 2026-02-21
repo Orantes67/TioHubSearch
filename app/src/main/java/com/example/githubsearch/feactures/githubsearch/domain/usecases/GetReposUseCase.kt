@@ -2,14 +2,15 @@ package com.example.githubsearch.feactures.githubsearch.domain.usecases
 
 import com.example.githubsearch.feactures.githubsearch.domain.entities.Repos
 import com.example.githubsearch.feactures.githubsearch.domain.repositories.ReposRepository
+import javax.inject.Inject
 
-class GetReposUseCase(private val reposRepository: ReposRepository) {
+class GetReposUseCase @Inject constructor(private val reposRepository: ReposRepository) {
     suspend operator fun invoke(
         query: String,
         categoryQuery: String = ""
     ): Result<List<Repos>> {
         return try {
-            // Construir la query final
+
             val finalQuery = buildFinalQuery(query, categoryQuery)
             
             if (finalQuery.isEmpty()) {

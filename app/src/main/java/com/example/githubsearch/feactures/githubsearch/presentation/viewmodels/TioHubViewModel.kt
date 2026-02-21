@@ -4,12 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.githubsearch.feactures.githubsearch.domain.entities.Repos
 import com.example.githubsearch.feactures.githubsearch.domain.usecases.GetReposUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TioHubViewModel(
+@HiltViewModel
+class TioHubViewModel @Inject constructor(
     private val getReposUseCase: GetReposUseCase
 ) : ViewModel() {
 
